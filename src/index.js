@@ -1,4 +1,4 @@
-const pdf = require("pdf-lib");
+const { PDFDocument } = require("pdf-lib");
 const canvas = require("canvas");
 const fs = require("fs");
 
@@ -23,8 +23,12 @@ function printGrid(grid) {
 
 /**
  * @param {string[]} words
+ * @param {string} filename
  */
 function drawWordSearch(words) {
+
+	// Create copy of words for list on image sidebar
+	let wordsCopy = words.slice();
 
 	// Create grid and populate with empty squares
     let grid = [];
@@ -68,18 +72,70 @@ function drawWordSearch(words) {
 		}
 	}
 
-	
+	// Draw grid
+	let wordSearchCanvas = new canvas.Canvas(800, 675).getContext("2d");
+	canvas.registerFont("src/resources/opensans.ttf", {"family": "Open Sans"});
+
+	wordSearchCanvas.strokeStyle = "#000000";
+	wordSearchCanvas.lineWidth = 2;
+
+	wordSearchCanvas.fillStyle = "#ffffff";
+	wordSearchCanvas.fillRect(0, 0, 800, 680);
+
+	wordSearchCanvas.fillStyle = "#000000";
+	wordSearchCanvas.font = "30px Open Sans";
+	for (let x = 0; x < config.gridSize; x++) {
+		for (let y = 0; y < config.gridSize; y++) {
+			wordSearchCanvas.strokeRect(x * 45, y * 45, 45, 45);
+
+			let letter = grid[y][x].toUpperCase();
+
+			let textLength = wordSearchCanvas.measureText(letter).width;
+			let xOffset = 22 - textLength / 2;
+
+			wordSearchCanvas.fillText(grid[y][x].toUpperCase(), x * 45 + xOffset, y * 45 + 30);
+		}
+	}
+
+	wordSearchCanvas.font = "20px Open Sans";
+	for (let word of wordsCopy) {
+		wordSearchCanvas.fillText(word, 680, 18 + 24 * wordsCopy.indexOf(word));
+	}
+
+	return wordSearchCanvas.canvas.toBuffer();
 
 }
 
-function main() {
+async function main() {
+
+	let wordSearchImages = [];
 
     for (let i = 0; i < config.wordSearchCount; i++) {
         let words = Dictionary.getRandomWords(config.wordsPerGrid);
-        console.log("Chosen words: " + words);
 
-        let wordSearchImage = drawWordSearch(words);
+		wordSearchImages.push(drawWordSearch(words));
+		console.log(`Generated ${i + 1} / ${config.wordSearchCount} word search images...`);
     }
+
+	let pdf = await PDFDocument.create();
+
+	for (let wordSearchImage of wordSearchImages) {
+		let page = pdf.addPage();
+		page.setSize(960, 960);
+
+		let pdfImage = await pdf.embedPng(wordSearchImage);
+
+		page.drawImage(pdfImage, {
+			x: 80,
+			y: 140,
+			width: 800,
+			height: 680
+		});
+	}
+
+	fs.createWriteStream("media/book.pdf").write(await pdf.save());
+
+	console.log("Created media/book.pdf!");
 
 }
 
