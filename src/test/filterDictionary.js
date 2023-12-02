@@ -2,11 +2,23 @@ const fs = require("fs");
 
 let dictionary = fs
     .readFileSync("src/resources/dictionary.txt", "utf-8")
+    .toLowerCase()
     .split("\n");
 
-let filteredDictionary = dictionary.filter(
-    (word) => word.length >= 4 && word.length <= 9 && !/[\W-]/g.test(word)
-);
+let filter = fs
+    .readFileSync("src/resources/filter.txt", "utf-8")
+    .split("\r\n");
+
+function wordFilter(word) {
+    return (
+        word.length >= 4 
+        && word.length <= 9 
+        && !/[\W-]/g.test(word) 
+        && !filter.some(bannedPattern => word.includes(bannedPattern))  
+    );
+}
+
+let filteredDictionary = dictionary.filter(wordFilter);
 
 fs.writeFileSync(
     "src/resources/filteredDictionary.txt",

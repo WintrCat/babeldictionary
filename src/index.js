@@ -8,6 +8,8 @@ const Random = require("./lib/Random");
 
 const config = require("./config.json");
 
+let usedWords = [];
+
 /**
  * @param {string[]} grid 
  */
@@ -100,6 +102,7 @@ function drawWordSearch(words) {
 	wordSearchCanvas.font = "20px Open Sans";
 	for (let word of wordsCopy) {
 		wordSearchCanvas.fillText(word, 680, 18 + 24 * wordsCopy.indexOf(word));
+		usedWords.push(word);
 	}
 
 	return wordSearchCanvas.canvas.toBuffer();
@@ -136,6 +139,10 @@ async function main() {
 	fs.createWriteStream("media/book.pdf").write(await pdf.save());
 
 	console.log("Created media/book.pdf!");
+
+	fs.writeFileSync("media/used.txt", usedWords.join("\n"));
+
+	console.log("Created media/used.txt and dumped all used words to it.");
 
 }
 
