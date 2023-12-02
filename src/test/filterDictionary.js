@@ -14,7 +14,9 @@ function wordFilter(word) {
         word.length >= 4 
         && word.length <= 9 
         && !/[\W-]/g.test(word) 
-        && !filter.some(bannedPattern => word.includes(bannedPattern))  
+        && !filter.some(bannedPattern => {
+            return bannedPattern.split(" ").some(bannedWord => word.includes(bannedWord) && bannedWord.length >= 2);
+        })  
     );
 }
 

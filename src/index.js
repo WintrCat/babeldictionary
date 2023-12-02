@@ -1,4 +1,4 @@
-const { PDFDocument } = require("pdf-lib");
+const { PDFDocument, StandardFonts } = require("pdf-lib");
 const canvas = require("canvas");
 const fs = require("fs");
 
@@ -125,8 +125,13 @@ async function main() {
 		console.log(`Generated ${i + 1} / ${config.wordSearchCount} word search images...`);
     }
 
+	console.log("Generating PDF document...");
+
 	let pdf = await PDFDocument.create();
 
+	let standardFont = await pdf.embedStandardFont(StandardFonts.HelveticaBold);
+
+	let pageNumber = 1;
 	for (let wordSearchImage of wordSearchImages) {
 		let page = pdf.addPage();
 		page.setSize(960, 960);
@@ -139,9 +144,15 @@ async function main() {
 			width: 800,
 			height: 680
 		});
-	}
 
-	console.log("Generating PDF document...");
+		page.drawText(`Puzzle #${pageNumber++}`, {
+			x: 80,
+			y: 850,
+			size: 40,
+			font: standardFont
+		});
+	}
+	
 	fs.createWriteStream("media/book.pdf").write(await pdf.save());
 	console.log("Created PDF document at media/book.pdf.");
 
