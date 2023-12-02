@@ -1,5 +1,5 @@
 {
-    "wordSearchCount": 250,
+    "wordSearchCount": 10,
     "gridSize": 15,
     "wordsPerGrid": 15
 }

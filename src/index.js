@@ -61,7 +61,12 @@ function drawWordSearch(words) {
             continue;
         }
 
-        Random.choice(validPlacements).place(grid);
+		let validOverlapPlacements = validPlacements.filter(placement => placement.overlaps);
+		if (validOverlapPlacements.length > 0) {
+			Random.choice(validOverlapPlacements).place(grid);
+		} else {
+			Random.choice(validPlacements).place(grid);
+		}
     }
 
 	// Fill remaining space with random letters
@@ -136,12 +141,11 @@ async function main() {
 		});
 	}
 
+	console.log("Generating PDF document...");
 	fs.createWriteStream("media/book.pdf").write(await pdf.save());
-
-	console.log("Created media/book.pdf!");
+	console.log("Created PDF document at media/book.pdf.");
 
 	fs.writeFileSync("media/used.txt", usedWords.join("\n"));
-
 	console.log("Created media/used.txt and dumped all used words to it.");
 
 }

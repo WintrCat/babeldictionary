@@ -18,12 +18,14 @@ class Placement {
         return placements;
     }
 
+    overlaps = false;
+
     /**
-   * @param {number} x
-   * @param {number} y
-   * @param {string} word,
-   * @param {number} rotation
-   */
+    * @param {number} x
+    * @param {number} y
+    * @param {string} word,
+    * @param {number} rotation
+    */
     constructor(x, y, word, rotation) {
         this.x = x;
         this.y = y;
@@ -40,7 +42,9 @@ class Placement {
         let currY = this.y;
         for (let i = 0; i < this.word.length; i++) {
             try {
-                if (grid[currY][currX] != " " && grid[currY][currX] != word[i]) {
+                if (grid[currY][currX] == this.word[i]) {
+                    this.overlaps = true;
+                } else if (grid[currY][currX] != " ") {
                     return false;
                 }
             } catch (err) {
