@@ -2,3 +2,4 @@ node_modules
 media/*.pdf
 media/*.png
 media/used.txt
+src/resources/*.psd
