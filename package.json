@@ -5,6 +5,7 @@
   },
   "scripts": {
     "start": "node src/index.js",
-    "filter-dictionary": "node src/test/filterDictionary.js"
+    "filter-dictionary": "node src/test/filterDictionary.js",
+    "fetch-definitions": "node src/test/fetchDefinitions.js"
   }
 }
